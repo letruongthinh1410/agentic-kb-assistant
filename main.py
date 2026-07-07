@@ -313,10 +313,16 @@ def main() -> None:
     state = load_state()
     added, updated, skipped, deleted_ids = categorise_articles(articles, state)
 
-    n_added = process_added(added, client, store_name, state)
-    n_updated = process_updated(updated, client, store_name, state)
+    MAX_UPLOADS_PER_RUN = 60
+    added_to_process = added[:MAX_UPLOADS_PER_RUN]
+    remaining = MAX_UPLOADS_PER_RUN - len(added_to_process)
+    updated_to_process = updated[:remaining] if remaining > 0 else []
+
+    n_added = process_added(added_to_process, client, store_name, state)
+    n_updated = process_updated(updated_to_process, client, store_name, state)
     n_deleted = process_deleted(deleted_ids, client, state)
-    n_skipped = len(skipped)
+    
+    n_skipped = len(skipped) + (len(added) - len(added_to_process)) + (len(updated) - len(updated_to_process))
 
     print("\n" + "=" * 60)
     print("  DAILY SYNC SUMMARY")
