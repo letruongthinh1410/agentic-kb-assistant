@@ -67,7 +67,7 @@ Runs via **GitHub Actions** (`.github/workflows/daily-sync.yml`), not
 Render/Railway/Fly.io — those no longer offer a free tier for cron jobs.
 
 **Daily job logs:**
-> _(fill in after first CI run)_ `https://github.com/<user>/<repo>/actions/runs/<id>`
+> `https://github.com/letruongthinh1410/agentic-kb-assistant/actions/runs/28889263778/job/85697364199`
 
 ---
 
