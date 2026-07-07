@@ -8,7 +8,7 @@ them to a Gemini File Search Store, and answers questions with cited URLs.
 ## Setup
 
 ```bash
-git clone <repo-url> && cd <repo>
+git clone https://github.com/letruongthinh1410/agentic-kb-assistant.git && cd agentic-kb-assistant
 python -m venv venv && venv\Scripts\activate   # Windows
 pip install -r requirements.txt
 cp .env.sample .env   # then fill in GEMINI_API_KEY
