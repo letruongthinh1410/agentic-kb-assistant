@@ -1,29 +1,6 @@
 """
-main.py — Daily pipeline: scrape Zendesk articles, detect changes, and
-synchronise the Gemini File Search Store (add / update / delete).
-
-Usage:
-    python main.py
-
-Required environment variables:
-    GEMINI_API_KEY    — Gemini Developer API key (never hard-code)
-
-    GEMINI_STORE_NAME — Full resource name of an existing File Search Store
-                        (e.g. fileSearchStores/optisignssupportdocs-xxxxx).
-                        Set this to skip the list/create step on re-runs.
-    GEMINI_MODEL      — Gemini model name (default: gemini-2.5-flash)
-    STATE_FILE        — Path to the state JSON file (default: state.json)
-    DOCS_DIR          — Directory to write Markdown files (default: docs)
-    ZENDESK_TOKEN     — Optional Zendesk Bearer token for private endpoints
-
-Exit codes:
-    0 — pipeline completed successfully.
-    1 — unrecoverable error (API failure, missing config, etc.).
-
-Deployment:
-    Run once locally:        python main.py
-    Run via Docker:          docker run -e GEMINI_API_KEY=... <image>
-    Scheduled via CI/CD:     .github/workflows/daily-sync.yml (GitHub Actions)
+main.py - Daily sync pipeline.
+Scrapes Zendesk articles, calculates deltas, and updates the Gemini File Search Store.
 """
 
 import json
@@ -37,8 +14,6 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-# Import helpers from the sibling modules.
-# We use specific imports to keep the dependency surface explicit.
 from scraper import (
     build_session,
     fetch_all_articles,
@@ -51,23 +26,14 @@ from upload_file_search import (
     _call_with_retry,
 )
 
-# ---------------------------------------------------------------------------
-# Configuration constants
-# ---------------------------------------------------------------------------
 load_dotenv()
 
-# Path to the persistent state file (maps article_id → upload metadata).
+# App settings
 STATE_FILE: Path = Path(os.getenv("STATE_FILE", "state.json"))
-
-# Directory where scraped Markdown files are written.
 DOCS_DIR: Path = Path(os.getenv("DOCS_DIR", "docs"))
-
-# Seconds to sleep between individual file uploads (free-tier rate-limit).
 UPLOAD_DELAY_SECONDS: float = 6.0
 
-# ---------------------------------------------------------------------------
-# Logging
-# ---------------------------------------------------------------------------
+# Setup basic logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -76,27 +42,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# State helpers  (crash-safe: written after every successful operation)
-# ---------------------------------------------------------------------------
-
 def load_state() -> dict:
-    """
-    Load the persisted state from STATE_FILE.
-
-    The state is a dict mapping str(article_id) to a record::
-
-        {
-          "updated_at":    "2025-01-01T00:00:00Z",
-          "slug":          "how-to-use-youtube-with-optisigns",
-          "document_name": "fileSearchStores/.../documents/..."
-        }
-
-    Returns:
-        dict: Loaded state, or an empty dict if the file does not exist.
-    """
+    """Loads article tracking state from JSON file."""
     if not STATE_FILE.exists():
-        logger.info("No state file found at %s — treating all articles as new.", STATE_FILE)
+        logger.info("No state file found at %s. Treating all articles as new.", STATE_FILE)
         return {}
     try:
         with STATE_FILE.open(encoding="utf-8") as fh:
@@ -104,53 +53,29 @@ def load_state() -> dict:
         logger.info("Loaded state for %d article(s) from %s.", len(state), STATE_FILE)
         return state
     except (json.JSONDecodeError, OSError) as exc:
-        logger.warning("Could not read state file (%s) — starting fresh.", exc)
+        logger.warning("Failed to load state (%s), starting fresh.", exc)
         return {}
 
 
 def save_state(state: dict) -> None:
-    """
-    Persist the current state dict to STATE_FILE (atomic write via temp file).
-
-    Called after every successful add / update / delete operation so that a
-    crash mid-run does not lose already-committed progress.
-
-    Args:
-        state: The full state dict to persist.
-    """
+    """Saves state dict atomically using a temp file."""
     tmp = STATE_FILE.with_suffix(".tmp")
     try:
         with tmp.open("w", encoding="utf-8") as fh:
             json.dump(state, fh, indent=2, ensure_ascii=False)
-        tmp.replace(STATE_FILE)  # atomic on POSIX; best-effort on Windows
+        tmp.replace(STATE_FILE)
     except OSError as exc:
         logger.error("Failed to save state: %s", exc)
 
 
-# ---------------------------------------------------------------------------
 # Gemini File Search Store helpers
-# ---------------------------------------------------------------------------
 
 def upload_single_file(
     client: genai.Client,
     store_name: str,
     path: Path,
 ) -> str | None:
-    """
-    Upload a single Markdown file to the Gemini File Search Store.
-
-    Uses _call_with_retry from upload_file_search for consistent backoff
-    behaviour (handles 429, 503, connection errors).
-
-    Args:
-        client:     Authenticated Gemini client.
-        store_name: Full resource name of the target File Search Store.
-        path:       Path to the local Markdown file.
-
-    Returns:
-        str: The document resource name (e.g. "fileSearchStores/.../documents/..."),
-             or None if the upload failed.
-    """
+    """Uploads a single markdown file to File Search Store."""
     display_name = path.name
     try:
         response = _call_with_retry(
@@ -163,10 +88,8 @@ def upload_single_file(
             ),
             label=f"upload {display_name}",
         )
-        # The SDK returns the created Document object; extract its resource name.
         doc_name = getattr(response, "name", None)
         if not doc_name:
-            # Fallback: search the store for the newly created document.
             doc_name = _find_document_name(client, store_name, display_name)
         return doc_name
     except Exception as exc:  # noqa: BLE001
@@ -179,19 +102,7 @@ def _find_document_name(
     store_name: str,
     display_name: str,
 ) -> str | None:
-    """
-    Look up a document's resource name by its display_name in the store.
-
-    Used as a fallback when the upload response does not include the name.
-
-    Args:
-        client:       Authenticated Gemini client.
-        store_name:   Full resource name of the File Search Store.
-        display_name: The display_name to search for.
-
-    Returns:
-        str: The document resource name, or None if not found.
-    """
+    """Finds document resource name by its display name in the store."""
     try:
         for doc in client.file_search_stores.documents.list(parent=store_name):
             if doc.display_name == display_name:
@@ -205,16 +116,7 @@ def delete_store_document(
     client: genai.Client,
     document_name: str,
 ) -> bool:
-    """
-    Delete a document from the Gemini File Search Store by its resource name.
-
-    Args:
-        client:        Authenticated Gemini client.
-        document_name: Full resource name of the document to delete.
-
-    Returns:
-        bool: True if deleted successfully, False otherwise.
-    """
+    """Deletes a document from File Search Store."""
     if not document_name:
         return False
     try:
@@ -230,29 +132,13 @@ def delete_store_document(
         return False
 
 
-# ---------------------------------------------------------------------------
 # Core pipeline logic
-# ---------------------------------------------------------------------------
 
 def categorise_articles(
     current_articles: list[dict],
     state: dict,
 ) -> tuple[list[dict], list[dict], list[dict], list[str]]:
-    """
-    Compare the current Zendesk article list against the persisted state and
-    classify each article into one of four buckets.
-
-    Args:
-        current_articles: All articles returned by the Zendesk API this run.
-        state:            Previously persisted state (may be empty on first run).
-
-    Returns:
-        tuple:
-            added   — Articles not previously seen (new article IDs).
-            updated — Articles whose updated_at timestamp changed.
-            skipped — Articles with no changes.
-            deleted — State keys whose article IDs are no longer in the API.
-    """
+    """Compares current articles with state and groups them into added, updated, skipped, deleted."""
     current_ids = {str(a["id"]) for a in current_articles}
     current_map = {str(a["id"]): a for a in current_articles}
 
@@ -286,20 +172,7 @@ def process_added(
     store_name: str,
     state: dict,
 ) -> int:
-    """
-    Scrape, convert, and upload each new article to the File Search Store.
-
-    Updates state after each successful upload (crash-safe).
-
-    Args:
-        articles:   List of new article dicts from the Zendesk API.
-        client:     Authenticated Gemini client.
-        store_name: Full resource name of the File Search Store.
-        state:      Mutable state dict; updated in-place.
-
-    Returns:
-        int: Number of articles successfully uploaded.
-    """
+    """Scrapes, converts and uploads new articles to the store."""
     success_count = 0
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -342,24 +215,7 @@ def process_updated(
     store_name: str,
     state: dict,
 ) -> int:
-    """
-    Re-scrape, delete the old document, and upload a new version for each
-    updated article.
-
-    Upload-before-delete strategy: if the upload succeeds but the delete
-    fails, the old document remains as an orphan (acceptable minor waste).
-    If the upload fails, the old document is preserved and the state is
-    unchanged so the article will be retried on the next run.
-
-    Args:
-        articles:   List of changed article dicts from the Zendesk API.
-        client:     Authenticated Gemini client.
-        store_name: Full resource name of the File Search Store.
-        state:      Mutable state dict; updated in-place.
-
-    Returns:
-        int: Number of articles successfully updated.
-    """
+    """Re-scrapes, deletes old document, and uploads new version for updated articles."""
     success_count = 0
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -377,13 +233,11 @@ def process_updated(
         slug = derive_slug(article.get("html_url", ""), article["id"])
         path = DOCS_DIR / f"{slug}.md"
 
-        # Upload new version first (preserves old doc if upload fails).
         new_doc_name = upload_single_file(client, store_name, path)
         if new_doc_name is None:
             logger.error("  → Upload failed — old version preserved; will retry next run.")
             continue
 
-        # Delete old document (best-effort; failure is non-fatal).
         if old_doc_name:
             delete_store_document(client, old_doc_name)
 
@@ -407,18 +261,7 @@ def process_deleted(
     client: genai.Client,
     state: dict,
 ) -> int:
-    """
-    Remove from the File Search Store any articles that no longer exist in
-    the Zendesk API, then remove them from the state.
-
-    Args:
-        deleted_ids: List of article IDs (as strings) to remove.
-        client:      Authenticated Gemini client.
-        state:       Mutable state dict; updated in-place.
-
-    Returns:
-        int: Number of articles successfully removed.
-    """
+    """Deletes no-longer-existent articles from the store and state."""
     success_count = 0
     for idx, aid in enumerate(deleted_ids, start=1):
         doc_name = state.get(aid, {}).get("document_name", "")
@@ -434,29 +277,12 @@ def process_deleted(
     return success_count
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
-
 def main() -> None:
-    """
-    Orchestrate the full daily sync pipeline:
-
-    1. Fetch all Zendesk articles (current state).
-    2. Load previous state from state.json.
-    3. Categorise: added / updated / skipped / deleted.
-    4. Process each category (write state.json after each success).
-    5. Print a final summary.
-
-    Exit codes:
-        0 — success.
-        1 — unrecoverable failure.
-    """
+    """Daily sync pipeline main entrypoint."""
     logger.info("=" * 60)
     logger.info("  OptiBot Daily Sync — starting pipeline")
     logger.info("=" * 60)
 
-    # ── Step 1: Gemini client + File Search Store ────────────────────────────
     try:
         client = build_client()
         store = get_or_create_file_search_store(
@@ -466,12 +292,11 @@ def main() -> None:
         store_name: str = store.name
         logger.info("Using File Search Store: %s", store_name)
     except SystemExit:
-        raise  # propagate intentional exit(1) from build_client
+        raise
     except Exception as exc:  # noqa: BLE001
         logger.error("Failed to initialise Gemini client/store: %s", exc)
         sys.exit(1)
 
-    # ── Step 2: Fetch current articles from Zendesk API ──────────────────────
     try:
         session = build_session()
         articles = fetch_all_articles(session)
@@ -485,19 +310,14 @@ def main() -> None:
 
     logger.info("Fetched %d article(s) from Zendesk.", len(articles))
 
-    # ── Step 3: Load previous state ──────────────────────────────────────────
     state = load_state()
-
-    # ── Step 4: Categorise articles ──────────────────────────────────────────
     added, updated, skipped, deleted_ids = categorise_articles(articles, state)
 
-    # ── Step 5: Process each category ────────────────────────────────────────
     n_added = process_added(added, client, store_name, state)
     n_updated = process_updated(updated, client, store_name, state)
     n_deleted = process_deleted(deleted_ids, client, state)
     n_skipped = len(skipped)
 
-    # ── Step 6: Final summary ────────────────────────────────────────────────
     print("\n" + "=" * 60)
     print("  DAILY SYNC SUMMARY")
     print("=" * 60)
@@ -509,7 +329,6 @@ def main() -> None:
     print(f"  State file            : {STATE_FILE.resolve()}")
     print("=" * 60 + "\n")
 
-    # Exact format required by GitHub Actions workflow grep / job summary.
     summary_line = (
         f"SUMMARY: Added={n_added} Updated={n_updated} "
         f"Skipped={n_skipped} Deleted={n_deleted}"
