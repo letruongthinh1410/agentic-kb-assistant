@@ -1,0 +1,27 @@
+# ── Secrets — NEVER commit ────────────────────────────────────────────────────
+.env
+
+# ── Python artefacts ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Scraped Markdown output (regenerated each run — optional to commit) ────────
+# Uncomment the line below ONLY if you do NOT want to commit the docs/ folder.
+# docs/
+
+# ── IDE / OS ───────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+
+# ── NOTE: state.json is intentionally NOT ignored. ────────────────────────────
+# GitHub Actions commits it back to the repo after every run so that delta
+# detection (add/update/skip/delete) works correctly across ephemeral runners.
+# Do NOT add state.json here.
