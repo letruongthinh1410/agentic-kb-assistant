@@ -21,6 +21,9 @@ env/
 .idea/
 .DS_Store
 
+# ── Local prep docs (Vietnamese, for interview prep only) ──────────────────────
+docs_setup/EXPLAIN_*.md
+
 # ── NOTE: state.json is intentionally NOT ignored. ────────────────────────────
 # GitHub Actions commits it back to the repo after every run so that delta
 # detection (add/update/skip/delete) works correctly across ephemeral runners.
