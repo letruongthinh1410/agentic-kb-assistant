@@ -77,11 +77,12 @@ Render/Railway/Fly.io — those no longer offer a free tier for cron jobs.
 
 ---
 
-## Implementation Notes
+## Technical Documentation
 
 | Doc | Topic |
 |---|---|
-| [EXPLAIN_scraper.md](docs_setup/EXPLAIN_scraper.md) | Zendesk API → Markdown, retry logic |
-| [EXPLAIN_gemini_file_search.md](docs_setup/EXPLAIN_gemini_file_search.md) | RAG, File Search Store, chunking |
-| [EXPLAIN_main_and_docker.md](docs_setup/EXPLAIN_main_and_docker.md) | Delta detection, state.json, Dockerfile |
-| [EXPLAIN_github_actions_deploy.md](docs_setup/EXPLAIN_github_actions_deploy.md) | GitHub Actions, Secrets, if:always() |
+| [scraper-architecture.md](docs_setup/scraper-architecture.md) | Zendesk API → Markdown, pagination, retry logic |
+| [gemini-file-search-rag.md](docs_setup/gemini-file-search-rag.md) | RAG pattern, File Search Store, chunking, embeddings |
+| [pipeline-state-management.md](docs_setup/pipeline-state-management.md) | Delta detection, state.json, crash-safe design |
+| [docker-containerization.md](docs_setup/docker-containerization.md) | Dockerfile, volume mounts, local testing |
+| [github-actions-deployment.md](docs_setup/github-actions-deployment.md) | GitHub Actions workflow, secrets, scheduled runs, ephemeral runners |
