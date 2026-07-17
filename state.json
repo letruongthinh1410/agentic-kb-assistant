@@ -855,9 +855,9 @@
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/editscreenwhatdoeseachoptio-7ytl7evjf4kx"
   },
   "360047275934": {
-    "updated_at": "2026-07-09T19:48:39Z",
+    "updated_at": "2026-07-16T10:01:04Z",
     "slug": "whitelist-optisigns-ip-addresses-ports",
-    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/whitelistoptisignsipaddress-lkucfi2jur43"
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/whitelistoptisignsipaddress-n9hg1i1y6qec"
   },
   "360047232054": {
     "updated_at": "2025-08-29T17:00:38Z",
@@ -1150,9 +1150,9 @@
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/advancedhowtoassignsecurity-efdyu7p28fcf"
   },
   "360053211594": {
-    "updated_at": "2025-08-29T20:39:30Z",
+    "updated_at": "2026-07-16T22:15:47Z",
     "slug": "set-optisigns-as-screensaver-on-windows",
-    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/setoptisignsasscreensaveron-m5qnnkrg7aa6"
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/setoptisignsasscreensaveron-uf4sfm26fdmb"
   },
   "360051014773": {
     "updated_at": "2025-07-31T18:59:55Z",
@@ -2023,5 +2023,10 @@
     "updated_at": "2026-02-03T18:12:07Z",
     "slug": "how-to-use-the-website-app-and-display-urls-on-optisigns",
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/howtousethewebsiteappanddis-djqg78w1brtn"
+  },
+  "53497007807251": {
+    "updated_at": "2026-07-16T16:39:52Z",
+    "slug": "device-management-and-mass-provisioning",
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/devicemanagementandmassprov-ovbgnn3zezlq"
   }
 }
