@@ -950,9 +950,9 @@
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/myimagecontentarebleedingof-ujrdc29eb5kq"
   },
   "360034883113": {
-    "updated_at": "2026-07-23T23:32:27Z",
+    "updated_at": "2026-08-04T19:17:14Z",
     "slug": "working-with-teams-and-security-levels",
-    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/workingwithteamsandsecurity-ti3wrtz8hrc4"
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/workingwithteamsandsecurity-hajs3gcb84f8"
   },
   "360034379293": {
     "updated_at": "2025-09-04T19:17:16Z",
@@ -2028,5 +2028,10 @@
     "updated_at": "2026-07-16T16:39:52Z",
     "slug": "device-management-and-mass-provisioning",
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/devicemanagementandmassprov-ovbgnn3zezlq"
+  },
+  "53952018650515": {
+    "updated_at": "2026-08-04T17:57:34Z",
+    "slug": "how-to-display-databricks-dashboards-on-optisigns",
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/howtodisplaydatabricksdashb-s45mdmmkfe6c"
   }
 }
