@@ -200,9 +200,9 @@
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/integratingpointofsalepossy-ceswvt6mg24r"
   },
   "31695220475283": {
-    "updated_at": "2025-08-29T17:04:07Z",
+    "updated_at": "2026-09-21T19:42:14Z",
     "slug": "configuring-mass-deployment-with-jamf-pro-mdm-on-apple-devices",
-    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/configuringmassdeploymentwi-m0f32ac945j4"
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/configuringmassdeploymentwi-mzg5yitwsokk"
   },
   "31449657955347": {
     "updated_at": "2026-09-10T09:51:34Z",
@@ -640,9 +640,9 @@
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/howtoapproveoptisignsasente-3otuiryazy30"
   },
   "4403332894867": {
-    "updated_at": "2026-09-10T09:46:28Z",
-    "slug": "how-to-set-up-audit-log-for-your-account",
-    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/howtosetupauditlogforyourac-ouu8zgbk4t2z"
+    "updated_at": "2026-09-21T20:44:11Z",
+    "slug": "setting-up-audit-logging",
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/settingupauditloggingmd-86frwue6r6xo"
   },
   "4403306341523": {
     "updated_at": "2025-09-04T18:20:07Z",
@@ -1290,9 +1290,9 @@
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/tutorialcreateupdateaddremo-0ymxdkmsne43"
   },
   "4411762539027": {
-    "updated_at": "2025-09-04T15:30:19Z",
-    "slug": "multilingual-and-multi-currency",
-    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/multilingualandmulticurrenc-ym426ovyaptd"
+    "updated_at": "2026-09-21T17:51:53Z",
+    "slug": "multilingual-and-multi-currency-options",
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/multilingualandmulticurrenc-mieufrxwn3ws"
   },
   "1500008112642": {
     "updated_at": "2026-09-10T09:45:51Z",
@@ -1385,9 +1385,9 @@
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/tutorialcreatingschedulesan-gx7jpgyif9av"
   },
   "35577511423635": {
-    "updated_at": "2026-03-30T17:22:38Z",
+    "updated_at": "2026-09-21T15:11:34Z",
     "slug": "optisigns-pro-player-advanced-features",
-    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/optisignsproplayeradvancedf-tyl7dhrqnzi9"
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/optisignsproplayeradvancedf-4umq5as6xq80"
   },
   "18500083191059": {
     "updated_at": "2026-09-10T09:49:54Z",
@@ -2053,5 +2053,10 @@
     "updated_at": "2026-09-15T15:34:23Z",
     "slug": "broadcast-send-scheduled-snapshots-of-your-dashboards",
     "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/broadcastsendscheduledsnaps-ryn2bq92ozmv"
+  },
+  "55640830295187": {
+    "updated_at": "2026-09-21T20:41:52Z",
+    "slug": "using-the-japan-transit-app",
+    "document_name": "fileSearchStores/optisignssupportdocs-9umxs3xlf0el/upload/operations/usingthejapantransitappmd-fjncfsj2d70m"
   }
 }
